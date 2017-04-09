@@ -83,22 +83,36 @@ RUN make && make install
 RUN ldconfig
 
 #zookeeper
+RUN adduser zookeeper
+RUN echo 'zookeeper:zookeeper' | chpasswd
+USER zookeeper
+
 ENV ZOOKEEPER_ACCOUNT=/home/zookeeper
 ENV ZOOKEEPER_HOME=$ZOOKEEPER_ACCOUNT/soft/apache/zookeeper/zookeeper-3.4.6
 ENV ZOOKEEPER_CONFIG_HOME=$ZOOKEEPER_HOME/conf
 
 RUN mkdir -p $ZOOKEEPER_ACCOUNT/soft/apache/zookeeper
-RUN adduser zookeeper
-RUN echo 'zookeeper:zookeeper' | chpasswd
+
 WORKDIR $ZOOKEEPER_ACCOUNT/soft/apache/zookeeper
 RUN wget http://apache.mirror.cdnetworks.com/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz
 RUN tar xvzf zookeeper-3.4.6.tar.gz
 
 ADD ./zookeeper-conf/zoo.cfg $ZOOKEEPER_CONFIG_HOME
+ADD ./zookeeper-conf/zkEnv.sh $ZOOKEEPER_HOME/bin
 RUN mkdir -p $ZOOKEEPER_HOME/zookeeper-data
+RUN mkdir -p $ZOOKEEPER_HOME/zookeeper-log
 
-#vim
-#apt-get install vim
+USER root
+RUN chown zookeeper:zookeeper $ZOOKEEPER_CONFIG_HOME/zoo.cfg
+RUN chown zookeeper:zookeeper $ZOOKEEPER_HOME/bin/zkEnv.sh
+
+#EXPOSE 2888 3888
+
+#etc
+USER root
+RUN apt-get -y install net-tools
+RUN apt-get -y install iputils-ping
+RUN apt-get -y install vim
 
 CMD ["/usr/sbin/sshd", "-D"]
 #CMD ["/etc/bootstrap.sh", "-d"]

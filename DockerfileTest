@@ -1,0 +1,10 @@
+FROM ubuntu:16.04
+
+#account
+RUN adduser test
+RUN echo 'test:test' | chpasswd
+
+USER test
+RUN mkdir -p /home/test/dir
+
+#USER root

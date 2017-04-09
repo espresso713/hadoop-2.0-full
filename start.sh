@@ -60,26 +60,29 @@ docker exec -it node2 sh -c 'tar -C /home/hadoop/soft/apache/hadoop -zxvf /home/
 docker exec -it node3 sh -c 'tar -C /home/hadoop/soft/apache/hadoop -zxvf /home/hadoop/soft/apache/hadoop/hadoop-2.6.0-1.0.tar.gz'
 docker exec -it node4 sh -c 'tar -C /home/hadoop/soft/apache/hadoop -zxvf /home/hadoop/soft/apache/hadoop/hadoop-2.6.0-1.0.tar.gz'
 
-#zookeeper
-docker exec -it node1 sh -c 'tar -C $ZOOKEEPER_HOME/.. -zcvf $ZOOKEEPER_HOME/../zookeeper-3.4.6-1.0.tar.gz zookeeper-3.4.6'
-docker exec -it node1 sh -c 'scp $ZOOKEEPER_HOME/../zookeeper-3.4.6-1.0.tar.gz root@node2:/home/zookeeper/soft/apache/zookeeper/'
-docker exec -it node1 sh -c 'scp $ZOOKEEPER_HOME/../zookeeper-3.4.6-1.0.tar.gz root@node3:/home/zookeeper/soft/apache/zookeeper/'
-
-
-docker exec -it node2 sh -c 'tar -C /home/zookeeper/soft/apache/zookeeper -zxvf /home/zookeeper/soft/apache/zookeeper/zookeeper-3.4.6-1.0.tar.gz'
-docker exec -it node3 sh -c 'tar -C /home/zookeeper/soft/apache/zookeeper -zxvf /home/zookeeper/soft/apache/zookeeper/zookeeper-3.4.6-1.0.tar.gz'
-
-docker exec -it node1 sh -c 'touch $ZOOKEEPER_HOME/zookeeper-data/myid';
-docker exec -it node2 sh -c 'touch $ZOOKEEPER_HOME/zookeeper-data/myid';
-docker exec -it node3 sh -c 'touch $ZOOKEEPER_HOME/zookeeper-data/myid';
-docker exec -it node1 sh -c 'echo 1 > $ZOOKEEPER_HOME/zookeeper-data/myid';
-docker exec -it node2 sh -c 'echo 2 > $ZOOKEEPER_HOME/zookeeper-data/myid';
-docker exec -it node3 sh -c 'echo 3 > $ZOOKEEPER_HOME/zookeeper-data/myid';
-
 #hadoop start
 #docker exec -it --user hadoop node1 sh -c '$HADOOP_HOME/bin/hdfs namenode -format';
 #docker exec -it --user hadoop node1 sh -c '$HADOOP_HOME/sbin/start-all.sh';
-docker exec -it --user root node1 /bin/bash
+
+#zookeeper
+docker exec -it -u zookeeper node1 sh -c 'tar -C $ZOOKEEPER_HOME/.. -zcvf $ZOOKEEPER_HOME/../zookeeper-3.4.6-1.0.tar.gz zookeeper-3.4.6'
+docker exec -it -u zookeeper node1 sh -c 'scp $ZOOKEEPER_HOME/../zookeeper-3.4.6-1.0.tar.gz root@node2:/home/zookeeper/soft/apache/zookeeper/'
+docker exec -it -u zookeeper node1 sh -c 'scp $ZOOKEEPER_HOME/../zookeeper-3.4.6-1.0.tar.gz root@node3:/home/zookeeper/soft/apache/zookeeper/'
+
+docker exec -it -u zookeeper node2 sh -c 'tar -C /home/zookeeper/soft/apache/zookeeper -zxvf /home/zookeeper/soft/apache/zookeeper/zookeeper-3.4.6-1.0.tar.gz'
+docker exec -it -u zookeeper node3 sh -c 'tar -C /home/zookeeper/soft/apache/zookeeper -zxvf /home/zookeeper/soft/apache/zookeeper/zookeeper-3.4.6-1.0.tar.gz'
+
+docker exec -it -u zookeeper node1 sh -c 'touch $ZOOKEEPER_HOME/zookeeper-data/myid';
+docker exec -it -u zookeeper node2 sh -c 'touch $ZOOKEEPER_HOME/zookeeper-data/myid';
+docker exec -it -u zookeeper node3 sh -c 'touch $ZOOKEEPER_HOME/zookeeper-data/myid';
+docker exec -it -u zookeeper node1 sh -c 'echo 1 > $ZOOKEEPER_HOME/zookeeper-data/myid';
+docker exec -it -u zookeeper node2 sh -c 'echo 2 > $ZOOKEEPER_HOME/zookeeper-data/myid';
+docker exec -it -u zookeeper node3 sh -c 'echo 3 > $ZOOKEEPER_HOME/zookeeper-data/myid';
+docker exec -it -u zookeeper node1 sh -c '$ZOOKEEPER_HOME/bin/zkServer.sh start';
+docker exec -it -u zookeeper node2 sh -c '$ZOOKEEPER_HOME/bin/zkServer.sh start';
+docker exec -it -u zookeeper node3 sh -c '$ZOOKEEPER_HOME/bin/zkServer.sh start';
+
+docker exec -it --user zookeeper node1 /bin/bash
 
 
 
