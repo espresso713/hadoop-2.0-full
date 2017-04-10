@@ -16,9 +16,9 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
 
 #env - account: hadoop
-ENV MY_HOME=/home/hadoop
+ENV HADOOP_ACCOUNT=/home/hadoop
 ENV JAVA_HOME=/usr/lib/jvm/java-8-oracle 
-ENV	HADOOP_HOME=$MY_HOME/soft/apache/hadoop/hadoop-2.6.0
+ENV	HADOOP_HOME=$HADOOP_ACCOUNT/soft/apache/hadoop/hadoop-2.6.0
 ENV	HADOOP_CONFIG_HOME=$HADOOP_HOME/etc/hadoop
 ENV	PATH=$PATH:$HADOOP_HOME/bin 
 ENV	PATH=$PATH:$HADOOP_HOME/sbin 
@@ -35,30 +35,30 @@ RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true 
 
 #account
 RUN adduser hadoop
-RUN echo 'hadoop:hadoop' | chpasswd
-#USER hadoop    
+RUN echo 'hadoop:hadoop' | chpasswd   
 
 #protobuf
-#USER root  
+USER root  
 RUN apt-get update
-RUN mkdir -p $MY_HOME/soft/protobuf
-WORKDIR $MY_HOME/soft/protobuf
-RUN wget https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz
-RUN tar xvzf protobuf-2.5.0.tar.gz
-WORKDIR $MY_HOME/soft/protobuf/protobuf-2.5.0
 RUN apt-get -y install make
 RUN apt-get -y install gcc
 RUN apt-get -y install g++
+
+WORKDIR /usr/local
+RUN wget https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz
+RUN tar xvzf protobuf-2.5.0.tar.gz
+WORKDIR /usr/local/protobuf-2.5.0
 RUN ./configure
 RUN make && make install
 RUN ldconfig
 
-RUN mkdir -p $MY_HOME/soft/apache/hadoop
 
-#vim
-#apt-get install vim
+#hadoop
+USER hadoop
+RUN mkdir -p $HADOOP_ACCOUNT/soft/apache/hadoop
 
 #zookeeper
+USER root 
 RUN adduser zookeeper
 RUN echo 'zookeeper:zookeeper' | chpasswd
 USER zookeeper
@@ -69,13 +69,6 @@ ENV ZOOKEEPER_CONFIG_HOME=$ZOOKEEPER_HOME/conf
 
 RUN mkdir -p $ZOOKEEPER_ACCOUNT/soft/apache/zookeeper
 
-#WORKDIR $ZOOKEEPER_ACCOUNT/soft/apache/zookeeper
-#RUN wget http://apache.mirror.cdnetworks.com/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz
-#RUN tar xvzf zookeeper-3.4.6.tar.gz
-
-#ADD ./zookeeper-conf/zoo.cfg $ZOOKEEPER_CONFIG_HOME
-#RUN mkdir -p $ZOOKEEPER_HOME/zookeeper-data
-
 #EXPOSE 2888 3888
 
 #etc
@@ -85,7 +78,7 @@ RUN apt-get -y install iputils-ping
 RUN apt-get -y install vim
 
 CMD ["/usr/sbin/sshd", "-D"]
-#CMD ["/etc/bootstrap.sh", "-d"]
+
 
 
 

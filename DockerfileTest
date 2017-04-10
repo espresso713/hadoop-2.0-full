@@ -1,10 +1,21 @@
 FROM ubuntu:16.04
 
-#account
-RUN adduser test
-RUN echo 'test:test' | chpasswd
+RUN adduser hadoop
+RUN echo 'hadoop:hadoop' | chpasswd
 
-USER test
-RUN mkdir -p /home/test/dir
-
-#USER root
+#protobuf
+#USER root  
+#RUN apt-get update
+#RUN apt-get -y install make
+#RUN apt-get -y install gcc
+#RUN apt-get -y install g++
+#
+#USER hadoop  
+#RUN mkdir -p $HADOOP_ACCOUNT/soft/protobuf
+#WORKDIR $HADOOP_ACCOUNT/soft/protobuf
+#RUN wget https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz
+#RUN tar xvzf protobuf-2.5.0.tar.gz
+#WORKDIR $HADOOP_ACCOUNT/soft/protobuf/protobuf-2.5.0
+#RUN ./configure
+#RUN make && make install
+#RUN ldconfig

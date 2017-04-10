@@ -36,53 +36,52 @@ RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true 
 #account
 RUN adduser hadoop
 RUN echo 'hadoop:hadoop' | chpasswd
-#USER hadoop    
-
+ 
 #hadoop
+USER hadoop   
 RUN mkdir -p $HADOOP_ACCOUNT/soft/apache/hadoop
 WORKDIR $HADOOP_ACCOUNT/soft/apache/hadoop
 RUN wget https://archive.apache.org/dist/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz
 RUN tar xvzf hadoop-2.6.0.tar.gz
 
 #hadoop-conf
+USER root
 ADD ./hadoop-conf/core-site.xml $HADOOP_CONFIG_HOME
 ADD ./hadoop-conf/hdfs-site.xml $HADOOP_CONFIG_HOME
 ADD ./hadoop-conf/mapred-site.xml $HADOOP_CONFIG_HOME
 ADD ./hadoop-conf/yarn-site.xml $HADOOP_CONFIG_HOME
+RUN chown hadoop:hadoop $HADOOP_CONFIG_HOME/core-site.xml
+RUN chown hadoop:hadoop $HADOOP_CONFIG_HOME/hdfs-site.xml
+RUN chown hadoop:hadoop $HADOOP_CONFIG_HOME/mapred-site.xml
+RUN chown hadoop:hadoop $HADOOP_CONFIG_HOME/yarn-site.xml
 
 #hadoop bootstrap.sh
+USER root
 ADD bootstrap.sh /etc
-RUN chown root:root /etc/bootstrap.sh
-RUN chmod 700 /etc/bootstrap.sh
-
-WORKDIR $HADOOP_CONFIG_HOME
-#RUN touch masters
+RUN chown hadoop:hadoop /etc/bootstrap.sh
 
 #etc
+USER hadoop
 RUN mkdir -p $HADOOP_ACCOUNT/soft/apache/hadoop/hadoop-2.6.0/hadoop-data
 RUN mkdir -p $HADOOP_ACCOUNT/soft/apache/hadoop/hadoop-2.6.0/pids
 
-
-#RUN echo export JAVA_HOME=/usr/lib/jvm/java-8-oracle >> hadoop-env.sh
-#RUN echo 'export HADOOP_HOME_WARN_SUPPRESS="TRUE"' >> hadoop-env.sh
-#RUN echo 'export HADOOP_PID_DIR=$HOME/soft/apache/hadoop/hadoop-2.6.0/pids' >> hadoop-env.sh
-
 #protobuf
-#USER root  
+USER root  
 RUN apt-get update
-RUN mkdir -p $HADOOP_ACCOUNT/soft/protobuf
-WORKDIR $HADOOP_ACCOUNT/soft/protobuf
-RUN wget https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz
-RUN tar xvzf protobuf-2.5.0.tar.gz
-WORKDIR $HADOOP_ACCOUNT/soft/protobuf/protobuf-2.5.0
 RUN apt-get -y install make
 RUN apt-get -y install gcc
 RUN apt-get -y install g++
+
+WORKDIR /usr/local
+RUN wget https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz
+RUN tar xvzf protobuf-2.5.0.tar.gz
+WORKDIR /usr/local/protobuf-2.5.0
 RUN ./configure
 RUN make && make install
 RUN ldconfig
 
 #zookeeper
+USER root  
 RUN adduser zookeeper
 RUN echo 'zookeeper:zookeeper' | chpasswd
 USER zookeeper
@@ -115,7 +114,7 @@ RUN apt-get -y install iputils-ping
 RUN apt-get -y install vim
 
 CMD ["/usr/sbin/sshd", "-D"]
-#CMD ["/etc/bootstrap.sh", "-d"]
+
 
 
 
