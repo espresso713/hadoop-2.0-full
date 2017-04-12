@@ -55,6 +55,12 @@ RUN chown hadoop:hadoop $HADOOP_CONFIG_HOME/hdfs-site.xml
 RUN chown hadoop:hadoop $HADOOP_CONFIG_HOME/mapred-site.xml
 RUN chown hadoop:hadoop $HADOOP_CONFIG_HOME/yarn-site.xml
 
+#hadoop example
+USER root
+RUN mkdir $HADOOP_ACCOUNT/work
+ADD ./work $HADOOP_ACCOUNT/work
+RUN chown -R hadoop:hadoop $HADOOP_ACCOUNT/work
+
 #hadoop bootstrap.sh
 USER root
 ADD bootstrap.sh /etc
